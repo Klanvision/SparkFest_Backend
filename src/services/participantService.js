@@ -53,7 +53,11 @@ class ParticipantService {
   }
 
   registerParticipant(data) {
-    const { fullName, email, phone, city = 'India', termsAccepted = true } = data;
+    const { fullName, email, phone, city = 'India', termsAccepted = true, selectedOffer = 'ten_entry' } = data;
+
+    let ticketCount = 1;
+    if (selectedOffer === 'festival_special') ticketCount = 3;
+    if (selectedOffer === 'early_bird') ticketCount = 5;
 
     if (!fullName || !fullName.trim()) {
       throw new Error('Full Name is required.');
@@ -88,12 +92,24 @@ class ParticipantService {
       }
     }
 
-    // Automatically issue the participant's lucky ticket
-    const ticket = ticketService.generateTicket(participant.id, 'draw-diwali-2026');
+    // Automatically issue the participant's lucky tickets
+    const tickets = [];
+    for (let i = 0; i < ticketCount; i++) {
+      const ticket = ticketService.generateTicket(participant.id, 'draw-diwali-2026');
+      tickets.push({
+        ticketNumber: ticket.ticketNumber,
+        status: ticket.status,
+        issuedAt: ticket.issuedAt,
+        drawId: ticket.drawId,
+        drawName: dataStore.draws[0].name,
+        drawDate: dataStore.draws[0].displayDate,
+        drawTime: dataStore.draws[0].displayTime
+      });
+    }
 
     dataStore.logAudit('REGISTER_PARTICIPANT', participant.id, {
       fullName: participant.fullName,
-      ticketNumber: ticket.ticketNumber
+      ticketCount: tickets.length
     });
 
     return {
@@ -104,15 +120,8 @@ class ParticipantService {
         phone: participant.phone,
         city: participant.city
       },
-      ticket: {
-        ticketNumber: ticket.ticketNumber,
-        status: ticket.status,
-        issuedAt: ticket.issuedAt,
-        drawId: ticket.drawId,
-        drawName: dataStore.draws[0].name,
-        drawDate: dataStore.draws[0].displayDate,
-        drawTime: dataStore.draws[0].displayTime
-      }
+      ticket: tickets[0], // Maintain backward compatibility
+      tickets: tickets
     };
   }
 
