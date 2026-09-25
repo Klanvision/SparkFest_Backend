@@ -17,6 +17,6 @@ module.exports = {
     // Set for Nov 10, 2026, 19:00:00 IST (UTC+05:30)
     scheduledAt: '2026-11-10T13:30:00.000Z',
     status: 'SCHEDULED', // SCHEDULED, LIVE, COMPLETED
-    totalPrizePool: '₹85,000+'
+    totalPrizePool: '₹8₹+'
   }
 };

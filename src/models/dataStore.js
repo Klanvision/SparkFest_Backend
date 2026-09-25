@@ -12,8 +12,8 @@ class DataStore {
         displayDate: '10 Nov 2026',
         displayTime: '07:00 PM (IST)',
         status: DRAW_STATUS.SCHEDULED,
-        totalPrizePool: '₹85,000+',
-        entryFee: '₹10',
+        totalPrizePool: 'Exclusive',
+        entryFee: 'ticket',
         totalParticipants: 4280,
         totalTickets: 6850,
         rules: [
@@ -26,66 +26,24 @@ class DataStore {
     ];
 
     this.prizes = [
-      {
-        id: 'prize-1',
-        drawId: 'draw-diwali-2026',
-        tier: PRIZE_TIERS.FIRST,
-        title: '1st Prize',
-        amount: '₹50,000',
-        numericAmount: 50000,
-        icon: 'trophy',
-        theme: 'gold',
-        description: 'Grand Cash Prize credited directly to verified bank account.',
-        winnersCount: 1,
-        eligibility: 'All confirmed tickets'
-      },
-      {
-        id: 'prize-2',
-        drawId: 'draw-diwali-2026',
-        tier: PRIZE_TIERS.SECOND,
-        title: '2nd Prize',
-        amount: '₹25,000',
-        numericAmount: 25000,
-        icon: 'award',
-        theme: 'silver',
-        description: 'Secondary Grand Cash Reward for lucky runner-up ticket.',
-        winnersCount: 1,
-        eligibility: 'All confirmed tickets'
-      },
-      {
-        id: 'prize-3',
-        drawId: 'draw-diwali-2026',
-        tier: PRIZE_TIERS.THIRD,
-        title: '3rd Prize',
-        amount: '₹10,000',
-        numericAmount: 10000,
-        icon: 'medal',
-        theme: 'bronze',
-        description: 'Festive Celebration Cash Reward for third place winner.',
-        winnersCount: 1,
-        eligibility: 'All confirmed tickets'
-      },
-      {
-        id: 'prize-4',
-        drawId: 'draw-diwali-2026',
-        tier: PRIZE_TIERS.FESTIVAL,
-        title: '10+ Festival Rewards',
-        amount: '₹1,000 Each',
-        numericAmount: 1000,
-        icon: 'gift',
-        theme: 'purple',
-        description: 'Ten additional festive hampers and rewards for lucky ticket holders.',
-        winnersCount: 10,
-        eligibility: 'All active participant tickets'
-      }
+      { id: 'prize-1', drawId: 'draw-diwali-2026', tier: '1st Prize', title: '1st Prize', amount: '₹10,000', numericAmount: 10000, icon: 'trophy', theme: 'gold', description: 'Mega Bumper Cracker Stash: An ultimate collection of premium multi-shot aerial cakes, sky lanterns, and exclusive display fireworks delivered safely to your door.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-2', drawId: 'draw-diwali-2026', tier: '2nd Prize', title: '2nd Prize', amount: '₹9,500', numericAmount: 9500, icon: 'award', theme: 'silver', description: 'Elite Celebration Box: Packed with high-end aerial shells, dazzling sparklers, and spectacular festive crackers for an unforgettable night.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-3', drawId: 'draw-diwali-2026', tier: '3rd Prize', title: '3rd Prize', amount: '₹9,000', numericAmount: 9000, icon: 'medal', theme: 'bronze', description: 'Royal Diwali Hamper: A majestic assortment of beautiful ground spinners, colorful fountains, and premium family-friendly crackers.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-4', drawId: 'draw-diwali-2026', tier: '4th Prize', title: '4th Prize', amount: '₹8,500', numericAmount: 8500, icon: 'star', theme: 'purple', description: 'Luxury Sparkler Kit: Exclusive premium sparklers and safe, low-smoke color fountains perfect for celebrating with family.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-5', drawId: 'draw-diwali-2026', tier: '5th Prize', title: '5th Prize', amount: '₹8,000', numericAmount: 8000, icon: 'gift', theme: 'blue', description: 'Festive Joy Bundle: A delightful mix of classic flower pots, charkhis, and assorted color rockets.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-6', drawId: 'draw-diwali-2026', tier: '6th Prize', title: '6th Prize', amount: '₹7,500', numericAmount: 7500, icon: 'crown', theme: 'emerald', description: 'Premium Aerial Assortment: High-quality aerial fireworks and sky shots securely packed for your celebration.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-7', drawId: 'draw-diwali-2026', tier: '7th Prize', title: '7th Prize', amount: '₹7,000', numericAmount: 7000, icon: 'sparkles', theme: 'ruby', description: 'Classic Cracker Combo: A beautifully crafted box of traditional Diwali crackers and color matches.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-8', drawId: 'draw-diwali-2026', tier: '8th Prize', title: '8th Prize', amount: '₹6,500', numericAmount: 6500, icon: 'diamond', theme: 'sapphire', description: 'Family Fiesta Pack: Safe, brilliant, and noise-free light displays designed for joyous family gatherings.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-9', drawId: 'draw-diwali-2026', tier: '9th Prize', title: '9th Prize', amount: '₹6,000', numericAmount: 6000, icon: 'heart', theme: 'rose', description: 'Starlight Collection: Premium quality sparklers, pencil crackers, and magical glowing wires.', winnersCount: 1, eligibility: 'All confirmed tickets' },
+      { id: 'prize-10', drawId: 'draw-diwali-2026', tier: '10th Prize', title: '10th Prize', amount: '₹5,500', numericAmount: 5500, icon: 'shield', theme: 'amber', description: 'Spark & Glow Hamper: A charming set of miniature fountains and vibrant ground fireworks to light up your evening.', winnersCount: 1, eligibility: 'All confirmed tickets' }
     ];
 
     this.offers = [
       {
         id: 'offer-1',
-        title: '₹10 Entry',
+        title: 'ticket Entry',
         subtitle: 'Special Entry Pass',
-        description: 'Just ₹10 for a chance to win amazing prizes and participate in the grand festival draw!',
+        description: 'Just ticket for a chance to win amazing prizes and participate in the grand festival draw!',
         badge: 'Popular',
         gradient: 'from-purple-900 via-indigo-900 to-purple-800',
         icon: 'sparkles',
@@ -116,7 +74,7 @@ class DataStore {
       }
     ];
 
-    this.winners = [
+        this.winners = [
       {
         id: 'win-1',
         drawId: 'draw-diwali-2026',
@@ -125,7 +83,7 @@ class DataStore {
         ticketNumber: 'DD-2026-45872',
         shortTicket: '#45872',
         prizeTitle: '1st Prize',
-        prizeAmount: '₹50,000',
+        prizeAmount: '₹10,000',
         tier: 'gold',
         drawDate: 'Diwali Mega Gala',
         city: 'Mumbai',
@@ -139,8 +97,8 @@ class DataStore {
         ticketNumber: 'DD-2026-37261',
         shortTicket: '#37261',
         prizeTitle: '2nd Prize',
-        prizeAmount: '₹25,000',
-        tier: 'silver',
+        prizeAmount: '₹9,500',
+        tier: 'gold',
         drawDate: 'Festival Kickoff',
         city: 'Pune',
         announcedAt: '2026-09-12T18:30:00.000Z'
@@ -153,8 +111,8 @@ class DataStore {
         ticketNumber: 'DD-2026-42903',
         shortTicket: '#42903',
         prizeTitle: '3rd Prize',
-        prizeAmount: '₹10,000',
-        tier: 'bronze',
+        prizeAmount: '₹9,000',
+        tier: 'gold',
         drawDate: 'Auspicious Round',
         city: 'Bengaluru',
         announcedAt: '2026-09-08T18:30:00.000Z'
@@ -166,10 +124,10 @@ class DataStore {
         maskedName: 'A*** R***',
         ticketNumber: 'DD-2026-18459',
         shortTicket: '#18459',
-        prizeTitle: 'Festival Reward',
-        prizeAmount: '₹5,000',
-        tier: 'purple',
-        drawDate: 'Early Bird Draw',
+        prizeTitle: '4th Prize',
+        prizeAmount: '₹8,500',
+        tier: 'gold',
+        drawDate: 'Grand Bumper Draw',
         city: 'Kolkata',
         announcedAt: '2026-09-05T18:30:00.000Z'
       },
@@ -180,12 +138,142 @@ class DataStore {
         maskedName: 'K*** N***',
         ticketNumber: 'DD-2026-51024',
         shortTicket: '#51024',
-        prizeTitle: 'Festival Reward',
-        prizeAmount: '₹1,000',
-        tier: 'purple',
+        prizeTitle: '5th Prize',
+        prizeAmount: '₹8,000',
+        tier: 'gold',
         drawDate: 'Weekly Spark',
         city: 'Delhi',
         announcedAt: '2026-09-01T18:30:00.000Z'
+      },
+      {
+        id: 'win-6',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Meena Iyer',
+        maskedName: 'M*** I***',
+        ticketNumber: 'DD-2026-63291',
+        shortTicket: '#63291',
+        prizeTitle: '6th Prize',
+        prizeAmount: '₹7,500',
+        tier: 'silver',
+        drawDate: 'Festive Special',
+        city: 'Chennai',
+        announcedAt: '2026-08-28T18:30:00.000Z'
+      },
+      {
+        id: 'win-7',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Rajesh Patel',
+        maskedName: 'R*** P***',
+        ticketNumber: 'DD-2026-74812',
+        shortTicket: '#74812',
+        prizeTitle: '7th Prize',
+        prizeAmount: '₹7,000',
+        tier: 'silver',
+        drawDate: 'Diwali Round 2',
+        city: 'Ahmedabad',
+        announcedAt: '2026-08-25T18:30:00.000Z'
+      },
+      {
+        id: 'win-8',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Sunita Joshi',
+        maskedName: 'S*** J***',
+        ticketNumber: 'DD-2026-82047',
+        shortTicket: '#82047',
+        prizeTitle: '8th Prize',
+        prizeAmount: '₹6,500',
+        tier: 'silver',
+        drawDate: 'Bumper Draw',
+        city: 'Hyderabad',
+        announcedAt: '2026-08-22T18:30:00.000Z'
+      },
+      {
+        id: 'win-9',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Arjun Verma',
+        maskedName: 'A*** V***',
+        ticketNumber: 'DD-2026-91365',
+        shortTicket: '#91365',
+        prizeTitle: '9th Prize',
+        prizeAmount: '₹6,000',
+        tier: 'silver',
+        drawDate: 'Grand Finale',
+        city: 'Jaipur',
+        announcedAt: '2026-08-18T18:30:00.000Z'
+      },
+      {
+        id: 'win-10',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Kavita Singh',
+        maskedName: 'K*** S***',
+        ticketNumber: 'DD-2026-10583',
+        shortTicket: '#10583',
+        prizeTitle: '10th Prize',
+        prizeAmount: '₹5,500',
+        tier: 'silver',
+        drawDate: 'Lucky Dip',
+        city: 'Lucknow',
+        announcedAt: '2026-08-15T18:30:00.000Z'
+      },
+      {
+        id: 'win-11',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Vikram Reddy',
+        maskedName: 'V*** R***',
+        ticketNumber: 'DD-2026-29147',
+        shortTicket: '#29147',
+        prizeTitle: 'Festival Special',
+        prizeAmount: '₹10,000',
+        offerTag: '3X Entries • Triple Chances',
+        tier: 'bronze',
+        drawDate: 'Festival Special Draw',
+        city: 'Visakhapatnam',
+        announcedAt: '2026-08-12T18:30:00.000Z'
+      },
+      {
+        id: 'win-12',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Deepa Krishnan',
+        maskedName: 'D*** K***',
+        ticketNumber: 'DD-2026-36820',
+        shortTicket: '#36820',
+        prizeTitle: 'Festival Special',
+        prizeAmount: '₹10,000',
+        offerTag: '3X Entries • Triple Chances',
+        tier: 'bronze',
+        drawDate: 'Festival Special Draw',
+        city: 'Kochi',
+        announcedAt: '2026-08-10T18:30:00.000Z'
+      },
+      {
+        id: 'win-13',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Mohan Das',
+        maskedName: 'M*** D***',
+        ticketNumber: 'DD-2026-47593',
+        shortTicket: '#47593',
+        prizeTitle: 'Early Bird Bonus',
+        prizeAmount: '₹10,000',
+        offerTag: '5X Entries • VIP Bumper Pool',
+        tier: 'purple',
+        drawDate: 'Early Bird Special',
+        city: 'Bhopal',
+        announcedAt: '2026-08-08T18:30:00.000Z'
+      },
+      {
+        id: 'win-14',
+        drawId: 'draw-diwali-2026',
+        winnerName: 'Neha Gupta',
+        maskedName: 'N*** G***',
+        ticketNumber: 'DD-2026-58406',
+        shortTicket: '#58406',
+        prizeTitle: 'Early Bird Bonus',
+        prizeAmount: '₹10,000',
+        offerTag: '5X Entries • VIP Bumper Pool',
+        tier: 'purple',
+        drawDate: 'Early Bird Special',
+        city: 'Chandigarh',
+        announcedAt: '2026-08-06T18:30:00.000Z'
       }
     ];
 
@@ -194,7 +282,7 @@ class DataStore {
         id: 'faq-1',
         category: 'General',
         question: 'What is Diwali Dhamaka Lucky Draw?',
-        answer: 'Diwali Dhamaka is a festival rewards and lucky draw initiative designed to celebrate the Festival of Lights with exciting cash prizes, gifts, and transparent verified digital participation.'
+        answer: 'Diwali Dhamaka is a festival rewards and lucky draw initiative designed to celebrate the Festival of Lights with exciting Gift prizes, gifts, and transparent verified digital participation.'
       },
       {
         id: 'faq-2',
@@ -252,7 +340,7 @@ class DataStore {
         participantId: 'part-1',
         drawId: 'draw-diwali-2026',
         status: TICKET_STATUS.WON,
-        prize: '1st Prize - ₹50,000',
+        prize: '1st Prize - Smart LED TV (55-inch)',
         issuedAt: '2026-09-10T10:05:00.000Z'
       },
       {
@@ -261,7 +349,7 @@ class DataStore {
         participantId: 'part-1',
         drawId: 'draw-diwali-2026',
         status: TICKET_STATUS.WON,
-        prize: '2nd Prize - ₹25,000',
+        prize: '2nd Prize - Latest 5G Smartphone',
         issuedAt: '2026-09-10T10:06:00.000Z'
       },
       {
