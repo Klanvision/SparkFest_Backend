@@ -18,5 +18,12 @@ module.exports = {
     scheduledAt: '2026-11-10T13:30:00.000Z',
     status: 'SCHEDULED', // SCHEDULED, LIVE, COMPLETED
     totalPrizePool: '₹8₹+'
+  },
+  cloudflare: {
+    databaseName: process.env.CLOUDFLARE_DATABASE_NAME || 'viswasluckydraw_db',
+    databaseId: process.env.CLOUDFLARE_DATABASE_ID || 'ffd21a79-cb5b-4b4f-b607-6e930b4478ef',
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID || '',
+    apiToken: process.env.CLOUDFLARE_API_TOKEN || ''
   }
 };
+

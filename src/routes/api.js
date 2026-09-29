@@ -48,12 +48,15 @@ router.post('/participants/register', participantController.register);
 // Contact
 router.post('/contact', contactController.submit);
 
-// Admin Routes (Public login, protected dashboard & actions)
+// Admin Routes (Public login & 2FA, protected dashboard, registrations & actions)
 router.post('/admin/login', adminController.login);
+router.post('/admin/verify-2fa', adminController.verify2Fa);
 router.get('/admin/dashboard', verifyAdmin, adminController.getDashboard);
+router.get('/admin/registrations', verifyAdmin, adminController.getRegistrations);
 router.get('/admin/audit-logs', verifyAdmin, adminController.getAuditLogs);
 router.get('/admin/contacts', verifyAdmin, contactController.getAll);
 router.put('/admin/draw/:id', verifyAdmin, adminController.updateDraw);
 router.post('/admin/draw/:id/execute', verifyAdmin, adminController.triggerWinner);
+router.post('/admin/spin', verifyAdmin, adminController.executeSpin);
 
 module.exports = router;

@@ -1,0 +1,14 @@
+name = "sparkfest-backend"
+main = "src/server.js"
+compatibility_date = "2024-09-23"
+
+# Cloudflare D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "viswasluckydraw_db"
+database_id = "ffd21a79-cb5b-4b4f-b607-6e930b4478ef"
+
+[vars]
+ENVIRONMENT = "production"
+JWT_SECRET = "diwali_dhamaka_super_secret_jwt_key_2026"
+ADMIN_EMAIL = "admin@diwalidhamaka.com"

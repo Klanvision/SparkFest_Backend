@@ -325,11 +325,102 @@ class DataStore {
     this.participants = [
       {
         id: 'part-1',
-        fullName: 'Kiran Kumar',
-        email: 'kiran.k@example.com',
+        fullName: 'Ramesh Sharma',
+        email: 'ramesh.sharma@gmail.com',
         phone: '9876543210',
+        city: 'Mumbai, Maharashtra',
+        location: 'Mumbai, Maharashtra',
+        plan: '30rs Plan',
         verified: true,
         createdAt: '2026-09-10T10:00:00.000Z'
+      },
+      {
+        id: 'part-2',
+        fullName: 'Priya Kulkarni',
+        email: 'priya.kulkarni@gmail.com',
+        phone: '9822012345',
+        city: 'Pune, Maharashtra',
+        location: 'Pune, Maharashtra',
+        plan: '10rs Plan',
+        verified: true,
+        createdAt: '2026-09-12T11:15:00.000Z'
+      },
+      {
+        id: 'part-3',
+        fullName: 'Suresh Menon',
+        email: 'suresh.menon@gmail.com',
+        phone: '9845098765',
+        city: 'Bengaluru, Karnataka',
+        location: 'Bengaluru, Karnataka',
+        plan: '50rs Plan',
+        verified: true,
+        createdAt: '2026-09-14T14:30:00.000Z'
+      },
+      {
+        id: 'part-4',
+        fullName: 'Ananya Roy',
+        email: 'ananya.roy@gmail.com',
+        phone: '9830123456',
+        city: 'Kolkata, West Bengal',
+        location: 'Kolkata, West Bengal',
+        plan: '30rs Plan',
+        verified: true,
+        createdAt: '2026-09-16T09:45:00.000Z'
+      },
+      {
+        id: 'part-5',
+        fullName: 'Kiran Nair',
+        email: 'kiran.nair@gmail.com',
+        phone: '9811234567',
+        city: 'New Delhi, Delhi',
+        location: 'New Delhi, Delhi',
+        plan: '10rs Plan',
+        verified: true,
+        createdAt: '2026-09-18T16:20:00.000Z'
+      },
+      {
+        id: 'part-6',
+        fullName: 'Rajesh Patel',
+        email: 'rajesh.patel@gmail.com',
+        phone: '9825123456',
+        city: 'Ahmedabad, Gujarat',
+        location: 'Ahmedabad, Gujarat',
+        plan: '50rs Plan',
+        verified: true,
+        createdAt: '2026-09-20T12:00:00.000Z'
+      },
+      {
+        id: 'part-7',
+        fullName: 'Sunita Joshi',
+        email: 'sunita.joshi@gmail.com',
+        phone: '9849012345',
+        city: 'Hyderabad, Telangana',
+        location: 'Hyderabad, Telangana',
+        plan: '30rs Plan',
+        verified: true,
+        createdAt: '2026-09-22T15:10:00.000Z'
+      },
+      {
+        id: 'part-8',
+        fullName: 'Arjun Verma',
+        email: 'arjun.verma@gmail.com',
+        phone: '9829012345',
+        city: 'Jaipur, Rajasthan',
+        location: 'Jaipur, Rajasthan',
+        plan: '10rs Plan',
+        verified: true,
+        createdAt: '2026-09-24T18:40:00.000Z'
+      },
+      {
+        id: 'part-9',
+        fullName: 'Kavita Singh',
+        email: 'kavita.singh@gmail.com',
+        phone: '9839012345',
+        city: 'Lucknow, Uttar Pradesh',
+        location: 'Lucknow, Uttar Pradesh',
+        plan: '30rs Plan',
+        verified: true,
+        createdAt: '2026-09-25T10:05:00.000Z'
       }
     ];
 
@@ -339,6 +430,7 @@ class DataStore {
         ticketNumber: 'DD-2026-45872',
         participantId: 'part-1',
         drawId: 'draw-diwali-2026',
+        plan: '30rs Plan',
         status: TICKET_STATUS.WON,
         prize: '1st Prize - Smart LED TV (55-inch)',
         issuedAt: '2026-09-10T10:05:00.000Z'
@@ -346,22 +438,85 @@ class DataStore {
       {
         id: 'tick-2',
         ticketNumber: 'DD-2026-37261',
-        participantId: 'part-1',
+        participantId: 'part-2',
         drawId: 'draw-diwali-2026',
+        plan: '10rs Plan',
         status: TICKET_STATUS.WON,
         prize: '2nd Prize - Latest 5G Smartphone',
-        issuedAt: '2026-09-10T10:06:00.000Z'
+        issuedAt: '2026-09-12T11:20:00.000Z'
       },
       {
-        id: 'tick-sample',
-        ticketNumber: 'DD-2026-99999',
-        participantId: 'part-sample',
+        id: 'tick-3',
+        ticketNumber: 'DD-2026-42903',
+        participantId: 'part-3',
         drawId: 'draw-diwali-2026',
+        plan: '50rs Plan',
         status: TICKET_STATUS.ACTIVE,
         prize: null,
-        issuedAt: new Date().toISOString()
+        issuedAt: '2026-09-14T14:35:00.000Z'
+      },
+      {
+        id: 'tick-4',
+        ticketNumber: 'DD-2026-18459',
+        participantId: 'part-4',
+        drawId: 'draw-diwali-2026',
+        plan: '30rs Plan',
+        status: TICKET_STATUS.ACTIVE,
+        prize: null,
+        issuedAt: '2026-09-16T09:50:00.000Z'
+      },
+      {
+        id: 'tick-5',
+        ticketNumber: 'DD-2026-51024',
+        participantId: 'part-5',
+        drawId: 'draw-diwali-2026',
+        plan: '10rs Plan',
+        status: TICKET_STATUS.ACTIVE,
+        prize: null,
+        issuedAt: '2026-09-18T16:25:00.000Z'
+      },
+      {
+        id: 'tick-6',
+        ticketNumber: 'DD-2026-74812',
+        participantId: 'part-6',
+        drawId: 'draw-diwali-2026',
+        plan: '50rs Plan',
+        status: TICKET_STATUS.ACTIVE,
+        prize: null,
+        issuedAt: '2026-09-20T12:05:00.000Z'
+      },
+      {
+        id: 'tick-7',
+        ticketNumber: 'DD-2026-82047',
+        participantId: 'part-7',
+        drawId: 'draw-diwali-2026',
+        plan: '30rs Plan',
+        status: TICKET_STATUS.ACTIVE,
+        prize: null,
+        issuedAt: '2026-09-22T15:15:00.000Z'
+      },
+      {
+        id: 'tick-8',
+        ticketNumber: 'DD-2026-91365',
+        participantId: 'part-8',
+        drawId: 'draw-diwali-2026',
+        plan: '10rs Plan',
+        status: TICKET_STATUS.ACTIVE,
+        prize: null,
+        issuedAt: '2026-09-24T18:45:00.000Z'
+      },
+      {
+        id: 'tick-9',
+        ticketNumber: 'DD-2026-10583',
+        participantId: 'part-9',
+        drawId: 'draw-diwali-2026',
+        plan: '30rs Plan',
+        status: TICKET_STATUS.ACTIVE,
+        prize: null,
+        issuedAt: '2026-09-25T10:10:00.000Z'
       }
     ];
+
 
     this.contactMessages = [];
     this.auditLogs = [];
