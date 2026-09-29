@@ -5,7 +5,13 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node src/server.js"
+    "dev": "node src/server.js",
+    "deploy": "wrangler deploy",
+    "d1:schema": "npx wrangler d1 execute viswasluckydraw_db --remote --file=./database/cloudflare-d1/schema.sql",
+    "d1:seed": "npx wrangler d1 execute viswasluckydraw_db --remote --file=./database/cloudflare-d1/seed.sql",
+    "d1:tables": "npx wrangler d1 execute viswasluckydraw_db --remote --command=\"SELECT name FROM sqlite_master WHERE type='table'\"",
+    "d1:local:schema": "npx wrangler d1 execute viswasluckydraw_db --local --file=./database/cloudflare-d1/schema.sql",
+    "d1:local:seed": "npx wrangler d1 execute viswasluckydraw_db --local --file=./database/cloudflare-d1/seed.sql"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -16,6 +22,8 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
     "uuid": "^11.1.0"
   }
 }

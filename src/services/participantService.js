@@ -56,8 +56,15 @@ class ParticipantService {
     const { fullName, email, phone, city = 'India', termsAccepted = true, selectedOffer = 'ten_entry' } = data;
 
     let ticketCount = 1;
-    if (selectedOffer === 'festival_special') ticketCount = 3;
-    if (selectedOffer === 'early_bird') ticketCount = 5;
+    let plan = '10rs Plan';
+    if (selectedOffer === 'festival_special') {
+      ticketCount = 3;
+      plan = '30rs Plan';
+    }
+    if (selectedOffer === 'early_bird') {
+      ticketCount = 5;
+      plan = '50rs Plan';
+    }
 
     if (!fullName || !fullName.trim()) {
       throw new Error('Full Name is required.');
@@ -82,6 +89,8 @@ class ParticipantService {
         email: email.trim().toLowerCase(),
         phone: cleanPhone,
         city: city.trim(),
+        location: city.trim(),
+        plan: plan,
         verified: true,
         createdAt: new Date().toISOString()
       };
@@ -90,15 +99,19 @@ class ParticipantService {
       if (draw) {
         draw.totalParticipants += 1;
       }
+    } else {
+      participant.plan = plan;
+      participant.location = city.trim();
     }
 
     // Automatically issue the participant's lucky tickets
     const tickets = [];
     for (let i = 0; i < ticketCount; i++) {
-      const ticket = ticketService.generateTicket(participant.id, 'draw-diwali-2026');
+      const ticket = ticketService.generateTicket(participant.id, 'draw-diwali-2026', plan);
       tickets.push({
         ticketNumber: ticket.ticketNumber,
         status: ticket.status,
+        plan: ticket.plan,
         issuedAt: ticket.issuedAt,
         drawId: ticket.drawId,
         drawName: dataStore.draws[0].name,
@@ -109,8 +122,10 @@ class ParticipantService {
 
     dataStore.logAudit('REGISTER_PARTICIPANT', participant.id, {
       fullName: participant.fullName,
+      plan,
       ticketCount: tickets.length
     });
+
 
     return {
       participant: {

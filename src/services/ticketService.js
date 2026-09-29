@@ -3,7 +3,7 @@ const { TICKET_STATUS } = require('../constants');
 const { v4: uuidv4 } = require('uuid');
 
 class TicketService {
-  generateTicket(participantId, drawId = 'draw-diwali-2026') {
+  generateTicket(participantId, drawId = 'draw-diwali-2026', plan = '10rs Plan') {
     // Generate 5-digit number
     let ticketNum;
     let attempts = 0;
@@ -18,6 +18,7 @@ class TicketService {
       ticketNumber: ticketNum,
       participantId,
       drawId,
+      plan: plan,
       status: TICKET_STATUS.ACTIVE,
       prize: null,
       issuedAt: new Date().toISOString()
@@ -29,9 +30,10 @@ class TicketService {
       draw.totalTickets += 1;
     }
 
-    dataStore.logAudit('GENERATE_TICKET', participantId, { ticketNumber: ticketNum, drawId });
+    dataStore.logAudit('GENERATE_TICKET', participantId, { ticketNumber: ticketNum, drawId, plan });
     return newTicket;
   }
+
 
   getTicketByNumber(ticketNumber) {
     const ticket = dataStore.tickets.find(
