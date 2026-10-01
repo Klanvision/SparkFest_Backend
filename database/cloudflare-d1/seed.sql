@@ -2,7 +2,12 @@
 -- SparkFest / Diwali Dhamaka - Cloudflare D1 Initial Seed Data
 -- ====================================================================
 
--- 1. Insert Initial Draw
+-- 1. Insert Admin Credentials (Configured permanently)
+DELETE FROM admins;
+INSERT INTO admins (email, password_hash, two_factor_setup_complete, failed_attempts) 
+VALUES ('kirankumamoopuri@example.com', 'klan@lucky333', 0, 0);
+
+-- 2. Insert Initial Draw
 INSERT OR REPLACE INTO draws (
   id, name, description, scheduled_at, display_date, display_time, status, total_prize_pool, entry_fee, total_participants, total_tickets, rules
 ) VALUES (

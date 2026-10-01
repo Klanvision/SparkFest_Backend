@@ -3,7 +3,18 @@
 -- Compatible with Cloudflare D1 (SQLite engine at the edge)
 -- ====================================================================
 
--- 1. Draws Table
+-- 1. Admins Table (For corporate-level security & 2FA)
+CREATE TABLE IF NOT EXISTS admins (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL, -- Storing hashed/salted passwords or plain for demo
+  two_factor_secret TEXT,
+  two_factor_setup_complete BOOLEAN DEFAULT 0,
+  failed_attempts INTEGER DEFAULT 0,
+  locked_until TEXT
+);
+
+-- 2. Draws Table
 CREATE TABLE IF NOT EXISTS draws (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,

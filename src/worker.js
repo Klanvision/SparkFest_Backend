@@ -273,39 +273,94 @@ export default {
         const body = await parseJsonBody(request);
         const { email, password } = body;
 
-        const validEmail = (env.ADMIN_EMAIL || 'admin@diwalidhamaka.com').toLowerCase();
-        const validPassword = env.ADMIN_PASSWORD || 'Admin@Diwali2026';
+        if (!env.DB) {
+          return jsonResponse({ success: false, message: 'Database binding not configured.' }, 500);
+        }
 
-        const isMatch = (
-          (email || '').trim().toLowerCase() === validEmail &&
-          (password || '').trim() === validPassword
-        );
+        // Query the D1 Database for the admin user
+        const stmt = env.DB.prepare('SELECT * FROM admins WHERE email = ? COLLATE NOCASE').bind((email || '').trim());
+        const adminUser = await stmt.first();
 
-        if (!isMatch) {
+        if (!adminUser) {
           return jsonResponse({
             success: false,
             message: 'Invalid administrator credentials. Please check your email and password.',
           }, 401);
         }
 
-        const base32Secret = 'JBSWY3DPEHPK3PXP';
-        const otpauthUrl = `otpauth://totp/Diwali%20Dhamaka:${encodeURIComponent(validEmail)}?secret=${base32Secret}&issuer=Diwali%20Dhamaka%202026`;
+        // Check if account is locked
+        if (adminUser.locked_until && new Date(adminUser.locked_until) > new Date()) {
+          return jsonResponse({
+            success: false,
+            message: 'ACCOUNT BLOCKED: Maximum failed attempts reached. Please contact super-admin or try again later.',
+          }, 403);
+        }
 
-        let qrCodeDataUrl = '';
-        try {
-          qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl, {
-            errorCorrectionLevel: 'M',
-            margin: 2,
-            width: 260,
-            color: { dark: '#0b0d1e', light: '#ffffff' }
+        // Validate password
+        if (password.trim() !== adminUser.password_hash) {
+          // Increment failed attempts
+          const newFails = (adminUser.failed_attempts || 0) + 1;
+          let lockQuery = 'UPDATE admins SET failed_attempts = ? WHERE id = ?';
+          let params = [newFails, adminUser.id];
+          
+          let errorMsg = `Invalid credentials. Warning: ${newFails}/3 failed attempts.`;
+          
+          if (newFails >= 3) {
+            // Lock for 15 minutes (or indefinitely as per corporate rules)
+            const lockTime = new Date(Date.now() + 15 * 60000).toISOString();
+            lockQuery = 'UPDATE admins SET failed_attempts = ?, locked_until = ? WHERE id = ?';
+            params = [newFails, lockTime, adminUser.id];
+            errorMsg = 'ACCOUNT BLOCKED: 3 consecutive failed attempts. Your account is now locked for security.';
+          }
+          
+          await env.DB.prepare(lockQuery).bind(...params).run();
+          
+          return jsonResponse({
+            success: false,
+            message: errorMsg,
+          }, 401);
+        }
+
+        // Credentials valid, reset failed attempts
+        if (adminUser.failed_attempts > 0) {
+          await env.DB.prepare('UPDATE admins SET failed_attempts = 0, locked_until = NULL WHERE id = ?').bind(adminUser.id).run();
+        }
+
+        // 2FA Flow
+        let base32Secret = adminUser.two_factor_secret;
+        let isFirstTime = adminUser.two_factor_setup_complete !== 1;
+        
+        if (isFirstTime || !base32Secret) {
+          const secretObj = speakeasy.generateSecret({
+            name: `Diwali Dhamaka (${adminUser.email})`,
+            issuer: 'Diwali Dhamaka 2026',
+            length: 20
           });
-        } catch (e) {
-          console.error('QR code generation failed:', e);
+          base32Secret = secretObj.base32;
+          await env.DB.prepare('UPDATE admins SET two_factor_secret = ? WHERE id = ?').bind(base32Secret, adminUser.id).run();
+          isFirstTime = true;
+        }
+
+        let qrCodeDataUrl = null;
+        let otpauthUrl = `otpauth://totp/Diwali%20Dhamaka:${encodeURIComponent(adminUser.email)}?secret=${base32Secret}&issuer=Diwali%20Dhamaka%202026`;
+
+        // Only generate QR code on FIRST TIME SETUP
+        if (isFirstTime) {
+          try {
+            qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl, {
+              errorCorrectionLevel: 'M',
+              margin: 2,
+              width: 260,
+              color: { dark: '#0b0d1e', light: '#ffffff' }
+            });
+          } catch (e) {
+            console.error('QR code generation failed:', e);
+          }
         }
 
         const jwtSecret = env.JWT_SECRET || 'diwali_dhamaka_super_secret_jwt_key_2026';
         const challengeToken = jwt.sign(
-          { sub: 'admin-1', step: '2FA_PENDING', email: validEmail },
+          { sub: adminUser.id, step: '2FA_PENDING', email: adminUser.email },
           jwtSecret,
           { expiresIn: '5m' }
         );
@@ -316,10 +371,13 @@ export default {
             requireOtp: true,
             challengeToken,
             qrCode: qrCodeDataUrl,
-            secret: base32Secret,
-            otpauthUrl,
-            email: validEmail,
-            message: 'Credentials verified! Scan the QR Code with Google Authenticator and enter the 6-digit OTP.',
+            secret: isFirstTime ? base32Secret : null,
+            otpauthUrl: isFirstTime ? otpauthUrl : null,
+            email: adminUser.email,
+            firstTime: isFirstTime,
+            message: isFirstTime 
+              ? 'Credentials verified! First time setup: Scan the QR Code with Google Authenticator and enter the 6-digit OTP.' 
+              : 'Credentials verified! Please enter the 6-digit OTP from your Authenticator app.',
           },
         });
       }
@@ -334,34 +392,72 @@ export default {
         }
 
         const jwtSecret = env.JWT_SECRET || 'diwali_dhamaka_super_secret_jwt_key_2026';
+        let decodedToken;
         try {
-          jwt.verify(challengeToken, jwtSecret);
+          decodedToken = jwt.verify(challengeToken, jwtSecret);
         } catch {
-          // Allow in case token expired during local testing
+          return jsonResponse({ success: false, message: 'Invalid or expired challenge token. Please login again.' }, 401);
+        }
+
+        if (!env.DB) {
+          return jsonResponse({ success: false, message: 'Database binding not configured.' }, 500);
+        }
+
+        const adminId = decodedToken.sub;
+        const adminUser = await env.DB.prepare('SELECT * FROM admins WHERE id = ?').bind(adminId).first();
+
+        if (!adminUser) {
+          return jsonResponse({ success: false, message: 'Admin account not found in database.' }, 401);
+        }
+
+        // Check if account is locked
+        if (adminUser.locked_until && new Date(adminUser.locked_until) > new Date()) {
+          return jsonResponse({
+            success: false,
+            message: 'ACCOUNT BLOCKED: Maximum failed attempts reached. Please contact super-admin or try again later.',
+          }, 403);
         }
 
         const cleanOtp = (otp || '').toString().trim();
-        const base32Secret = 'JBSWY3DPEHPK3PXP';
+        const base32Secret = adminUser.two_factor_secret;
 
         const isTotpValid = speakeasy.totp.verify({
           secret: base32Secret,
           encoding: 'base32',
           token: cleanOtp,
-          window: 2,
+          window: 2, // Allow slight time drift
         });
 
-        // Accept live TOTP or master bypass codes (123456 or 777888)
-        const isValid = isTotpValid || cleanOtp === '123456' || cleanOtp === '777888';
+        // For corporate strictness, we remove the master bypass codes in production
+        // ONLY accept valid TOTP from Authenticator
+        if (!isTotpValid) {
+          // Increment failed attempts for wrong OTP as well
+          const newFails = (adminUser.failed_attempts || 0) + 1;
+          let lockQuery = 'UPDATE admins SET failed_attempts = ? WHERE id = ?';
+          let params = [newFails, adminUser.id];
+          
+          let errorMsg = `Invalid Authenticator Code. Warning: ${newFails}/3 failed attempts.`;
+          
+          if (newFails >= 3) {
+            const lockTime = new Date(Date.now() + 15 * 60000).toISOString();
+            lockQuery = 'UPDATE admins SET failed_attempts = ?, locked_until = ? WHERE id = ?';
+            params = [newFails, lockTime, adminUser.id];
+            errorMsg = 'ACCOUNT BLOCKED: 3 consecutive failed attempts. Your account is now locked for security.';
+          }
+          
+          await env.DB.prepare(lockQuery).bind(...params).run();
 
-        if (!isValid) {
           return jsonResponse({
             success: false,
-            message: 'Invalid 6-digit Authenticator OTP. Please try again.',
+            message: errorMsg,
           }, 401);
         }
 
+        // OTP Valid - Mark setup complete, reset fails
+        await env.DB.prepare('UPDATE admins SET two_factor_setup_complete = 1, failed_attempts = 0, locked_until = NULL WHERE id = ?').bind(adminUser.id).run();
+
         const adminSessionToken = jwt.sign(
-          { sub: 'admin-1', role: 'admin', email: env.ADMIN_EMAIL || 'admin@diwalidhamaka.com' },
+          { sub: adminUser.id, role: 'admin', email: adminUser.email },
           jwtSecret,
           { expiresIn: '24h' }
         );
@@ -370,7 +466,7 @@ export default {
           success: true,
           data: {
             token: adminSessionToken,
-            user: { email: env.ADMIN_EMAIL || 'admin@diwalidhamaka.com', role: 'admin' },
+            user: { email: adminUser.email, role: 'admin' },
           },
           message: 'Authenticator OTP verified successfully. Welcome, Administrator!',
         });
