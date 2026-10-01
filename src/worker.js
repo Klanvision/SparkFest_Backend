@@ -279,7 +279,23 @@ export default {
 
         // Always fetch the primary admin to check global lockout status (even if wrong email entered)
         let adminUser = await env.DB.prepare('SELECT * FROM admins WHERE email = ? COLLATE NOCASE').bind((email || '').trim()).first();
-        const primaryAdmin = await env.DB.prepare('SELECT * FROM admins WHERE id = 1').first();
+        let primaryAdmin = await env.DB.prepare('SELECT * FROM admins ORDER BY id ASC LIMIT 1').first();
+        
+        // Auto-seed if database is completely empty (no admins exist)
+        if (!primaryAdmin) {
+          try {
+            await env.DB.prepare(
+              "INSERT INTO admins (email, password_hash, two_factor_setup_complete, failed_attempts) VALUES (?, ?, 0, 0)"
+            ).bind('kirankumamoopuri@gmail.com', 'klan@lucky333').run();
+            primaryAdmin = await env.DB.prepare('SELECT * FROM admins ORDER BY id ASC LIMIT 1').first();
+            if ((email || '').trim().toLowerCase() === 'kirankumamoopuri@gmail.com') {
+               adminUser = primaryAdmin;
+            }
+          } catch (e) {
+            console.error('Auto-seed failed:', e);
+          }
+        }
+
         const targetAdmin = adminUser || primaryAdmin;
 
         if (!targetAdmin) {
