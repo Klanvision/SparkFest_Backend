@@ -8,8 +8,8 @@ module.exports = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '24h',
   corsOrigin: process.env.CORS_ORIGIN || '*',
   adminCredentials: {
-    email: process.env.ADMIN_EMAIL || 'admin@diwalidhamaka.com',
-    password: process.env.ADMIN_PASSWORD || 'Admin@Diwali2026'
+    email: process.env.ADMIN_EMAIL || 'kirankumamoopuri@gmail.com',
+    password: process.env.ADMIN_PASSWORD || 'klan@lucky333'
   },
   defaultDraw: {
     id: 'draw-diwali-2026',

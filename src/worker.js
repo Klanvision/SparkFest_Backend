@@ -49,7 +49,7 @@ function verifyAdminToken(request, env) {
   } catch {
     // Also accept mock session tokens generated in client demo mode
     if (token.startsWith('dd_admin_session_') || token.startsWith('demo_token_')) {
-      return { email: env.ADMIN_EMAIL || 'admin@diwalidhamaka.com', role: 'admin' };
+      return { email: env.ADMIN_EMAIL || 'kirankumamoopuri@gmail.com', role: 'admin' };
     }
     return null;
   }
@@ -277,40 +277,37 @@ export default {
           return jsonResponse({ success: false, message: 'Database binding not configured.' }, 500);
         }
 
-        // Query the D1 Database for the admin user
-        const stmt = env.DB.prepare('SELECT * FROM admins WHERE email = ? COLLATE NOCASE').bind((email || '').trim());
-        const adminUser = await stmt.first();
+        // Always fetch the primary admin to check global lockout status (even if wrong email entered)
+        let adminUser = await env.DB.prepare('SELECT * FROM admins WHERE email = ? COLLATE NOCASE').bind((email || '').trim()).first();
+        const primaryAdmin = await env.DB.prepare('SELECT * FROM admins WHERE id = 1').first();
+        const targetAdmin = adminUser || primaryAdmin;
 
-        if (!adminUser) {
-          return jsonResponse({
-            success: false,
-            message: 'Invalid administrator credentials. Please check your email and password.',
-          }, 401);
+        if (!targetAdmin) {
+           return jsonResponse({ success: false, message: 'System error: No admin accounts configured.' }, 500);
         }
 
         // Check if account is locked
-        if (adminUser.locked_until && new Date(adminUser.locked_until) > new Date()) {
+        if (targetAdmin.locked_until && new Date(targetAdmin.locked_until) > new Date()) {
           return jsonResponse({
             success: false,
-            message: 'ACCOUNT BLOCKED: Maximum failed attempts reached. Please contact super-admin or try again later.',
+            message: 'SECURITY LOCKDOWN: Maximum failed attempts reached. The Administrator panel is temporarily blocked to protect against unauthorized access.',
+            isLocked: true
           }, 403);
         }
 
-        // Validate password
-        if (password.trim() !== adminUser.password_hash) {
-          // Increment failed attempts
-          const newFails = (adminUser.failed_attempts || 0) + 1;
+        // If email was wrong OR password was wrong
+        if (!adminUser || password.trim() !== adminUser.password_hash) {
+          const newFails = (targetAdmin.failed_attempts || 0) + 1;
           let lockQuery = 'UPDATE admins SET failed_attempts = ? WHERE id = ?';
-          let params = [newFails, adminUser.id];
+          let params = [newFails, targetAdmin.id];
           
-          let errorMsg = `Invalid credentials. Warning: ${newFails}/3 failed attempts.`;
+          let errorMsg = `AUTHORIZATION FAILED: Invalid credentials. Warning: ${newFails}/3 failed attempts remaining before lockdown.`;
           
           if (newFails >= 3) {
-            // Lock for 15 minutes (or indefinitely as per corporate rules)
             const lockTime = new Date(Date.now() + 15 * 60000).toISOString();
             lockQuery = 'UPDATE admins SET failed_attempts = ?, locked_until = ? WHERE id = ?';
-            params = [newFails, lockTime, adminUser.id];
-            errorMsg = 'ACCOUNT BLOCKED: 3 consecutive failed attempts. Your account is now locked for security.';
+            params = [newFails, lockTime, targetAdmin.id];
+            errorMsg = 'SECURITY LOCKDOWN: 3 consecutive failed attempts detected. The Administrator panel is now blocked for 15 minutes.';
           }
           
           await env.DB.prepare(lockQuery).bind(...params).run();
@@ -318,6 +315,8 @@ export default {
           return jsonResponse({
             success: false,
             message: errorMsg,
+            isLocked: newFails >= 3,
+            attempts: newFails
           }, 401);
         }
 
@@ -414,7 +413,8 @@ export default {
         if (adminUser.locked_until && new Date(adminUser.locked_until) > new Date()) {
           return jsonResponse({
             success: false,
-            message: 'ACCOUNT BLOCKED: Maximum failed attempts reached. Please contact super-admin or try again later.',
+            message: 'SECURITY LOCKDOWN: Maximum failed attempts reached. The Administrator panel is temporarily blocked to protect against unauthorized access.',
+            isLocked: true
           }, 403);
         }
 
@@ -436,13 +436,13 @@ export default {
           let lockQuery = 'UPDATE admins SET failed_attempts = ? WHERE id = ?';
           let params = [newFails, adminUser.id];
           
-          let errorMsg = `Invalid Authenticator Code. Warning: ${newFails}/3 failed attempts.`;
+          let errorMsg = `AUTHORIZATION FAILED: Invalid Authenticator Code. Warning: ${newFails}/3 failed attempts remaining before lockdown.`;
           
           if (newFails >= 3) {
             const lockTime = new Date(Date.now() + 15 * 60000).toISOString();
             lockQuery = 'UPDATE admins SET failed_attempts = ?, locked_until = ? WHERE id = ?';
             params = [newFails, lockTime, adminUser.id];
-            errorMsg = 'ACCOUNT BLOCKED: 3 consecutive failed attempts. Your account is now locked for security.';
+            errorMsg = 'SECURITY LOCKDOWN: 3 consecutive failed attempts detected. The Administrator panel is now blocked for 15 minutes.';
           }
           
           await env.DB.prepare(lockQuery).bind(...params).run();
@@ -450,6 +450,8 @@ export default {
           return jsonResponse({
             success: false,
             message: errorMsg,
+            isLocked: newFails >= 3,
+            attempts: newFails
           }, 401);
         }
 

@@ -5,7 +5,7 @@
 -- 1. Insert Admin Credentials (Configured permanently)
 DELETE FROM admins;
 INSERT INTO admins (email, password_hash, two_factor_setup_complete, failed_attempts) 
-VALUES ('kirankumamoopuri@example.com', 'klan@lucky333', 0, 0);
+VALUES ('kirankumamoopuri@gmail.com', 'klan@lucky333', 0, 0);
 
 -- 2. Insert Initial Draw
 INSERT OR REPLACE INTO draws (
@@ -105,6 +105,3 @@ INSERT OR REPLACE INTO tickets (id, ticket_number, participant_id, draw_id, plan
 ('tick-13', 'DD-2026-88392', 'part-13', 'draw-diwali-2026', '50rs Plan', 'ACTIVE', NULL, '2026-09-29T14:15:00.000Z'),
 ('tick-14', 'DD-2026-99481', 'part-14', 'draw-diwali-2026', '50rs Plan', 'ACTIVE', NULL, '2026-09-29T15:40:00.000Z');
 
--- 8. Insert Default Administrator
-INSERT OR REPLACE INTO admins (id, email, password_hash, role, created_at) VALUES
-('admin-1', 'admin@diwalidhamaka.com', '$2a$10$w8uR3Ue0jK8wKx9l9jG.QOB5rK9mG3q9sYfG5pP2mD9kH7wQ8x6Y2', 'ADMIN', '2026-09-01T00:00:00.000Z');

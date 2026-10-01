@@ -11,4 +11,4 @@ database_id = "ffd21a79-cb5b-4b4f-b607-6e930b4478ef"
 [vars]
 ENVIRONMENT = "production"
 JWT_SECRET = "diwali_dhamaka_super_secret_jwt_key_2026"
-ADMIN_EMAIL = "admin@diwalidhamaka.com"
+ADMIN_EMAIL = "kirankumamoopuri@gmail.com"
