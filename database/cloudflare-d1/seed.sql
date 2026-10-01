@@ -5,7 +5,7 @@
 -- 1. Insert Admin Credentials (Configured permanently)
 DELETE FROM admins;
 INSERT INTO admins (email, password_hash, two_factor_setup_complete, failed_attempts) 
-VALUES ('kirankumamoopuri@gmail.com', 'klan@lucky333', 0, 0);
+VALUES ('kirankumarmoopuri@gmail.com', 'klan@lucky', 0, 0);
 
 -- 2. Insert Initial Draw
 INSERT OR REPLACE INTO draws (

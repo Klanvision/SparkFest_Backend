@@ -300,9 +300,9 @@ export default {
           try {
             await env.DB.prepare(
               "INSERT INTO admins (email, password_hash, two_factor_setup_complete, failed_attempts) VALUES (?, ?, 0, 0)"
-            ).bind('kirankumamoopuri@gmail.com', 'klan@lucky333').run();
+            ).bind('kirankumarmoopuri@gmail.com', 'klan@lucky').run();
             primaryAdmin = await env.DB.prepare('SELECT * FROM admins ORDER BY id ASC LIMIT 1').first();
-            if ((email || '').trim().toLowerCase() === 'kirankumamoopuri@gmail.com') {
+            if ((email || '').trim().toLowerCase() === 'kirankumarmoopuri@gmail.com') {
                adminUser = primaryAdmin;
             }
           } catch (e) {
