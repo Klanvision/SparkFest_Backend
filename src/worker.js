@@ -277,6 +277,20 @@ export default {
           return jsonResponse({ success: false, message: 'Database binding not configured.' }, 500);
         }
 
+        // Ensure schema is up to date for corporate security (auto-migrate if columns are missing)
+        try {
+          const tableInfo = await env.DB.prepare("PRAGMA table_info(admins)").all();
+          const columns = tableInfo.results.map(r => r.name);
+          if (!columns.includes('failed_attempts')) {
+            await env.DB.prepare("ALTER TABLE admins ADD COLUMN failed_attempts INTEGER DEFAULT 0").run();
+          }
+          if (!columns.includes('locked_until')) {
+            await env.DB.prepare("ALTER TABLE admins ADD COLUMN locked_until TEXT").run();
+          }
+        } catch (migrationError) {
+          console.error("Auto-migration error:", migrationError);
+        }
+
         // Always fetch the primary admin to check global lockout status (even if wrong email entered)
         let adminUser = await env.DB.prepare('SELECT * FROM admins WHERE email = ? COLLATE NOCASE').bind((email || '').trim()).first();
         let primaryAdmin = await env.DB.prepare('SELECT * FROM admins ORDER BY id ASC LIMIT 1').first();
@@ -416,6 +430,20 @@ export default {
 
         if (!env.DB) {
           return jsonResponse({ success: false, message: 'Database binding not configured.' }, 500);
+        }
+
+        // Ensure schema is up to date for corporate security (auto-migrate if columns are missing)
+        try {
+          const tableInfo = await env.DB.prepare("PRAGMA table_info(admins)").all();
+          const columns = tableInfo.results.map(r => r.name);
+          if (!columns.includes('failed_attempts')) {
+            await env.DB.prepare("ALTER TABLE admins ADD COLUMN failed_attempts INTEGER DEFAULT 0").run();
+          }
+          if (!columns.includes('locked_until')) {
+            await env.DB.prepare("ALTER TABLE admins ADD COLUMN locked_until TEXT").run();
+          }
+        } catch (migrationError) {
+          console.error("Auto-migration error:", migrationError);
         }
 
         const adminId = decodedToken.sub;
