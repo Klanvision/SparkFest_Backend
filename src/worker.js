@@ -287,6 +287,11 @@ export default {
           if (!columns.includes('locked_until')) {
             await env.DB.prepare("ALTER TABLE admins ADD COLUMN locked_until TEXT").run();
           }
+          
+          // Force update the primary admin to the new corrected credentials and reset lockout
+          await env.DB.prepare(
+            "UPDATE admins SET email = 'kirankumarmoopuri@gmail.com', password_hash = 'klan@lucky', failed_attempts = 0, locked_until = NULL WHERE id = 1"
+          ).run();
         } catch (migrationError) {
           console.error("Auto-migration error:", migrationError);
         }
