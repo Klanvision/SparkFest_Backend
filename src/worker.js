@@ -156,18 +156,23 @@ export default {
 
       // 6. Winners API
       if (pathname === '/api/winners' && method === 'GET') {
-        const search = (url.searchParams.get('search') || '').toLowerCase();
-        const tier = url.searchParams.get('tier') || 'all';
+        const rawSearch = (url.searchParams.get('search') || '').trim();
+        const search = (rawSearch === 'undefined' || rawSearch === 'null') ? '' : rawSearch.toLowerCase();
+        const rawTier = (url.searchParams.get('tier') || 'all').trim().toLowerCase();
+        const tier = (rawTier === 'undefined' || rawTier === 'null' || rawTier === 'all') ? '' : rawTier;
 
         let winners = dataStore.winners;
-        if (tier && tier !== 'all') {
-          winners = winners.filter(w => (w.prizeTier || '').toLowerCase().includes(tier.toLowerCase()));
+        if (tier) {
+          winners = winners.filter(w => (w.tier || w.prizeTier || '').toLowerCase() === tier);
         }
         if (search) {
           winners = winners.filter(w =>
             (w.maskedName || '').toLowerCase().includes(search) ||
+            (w.winnerName || '').toLowerCase().includes(search) ||
+            (w.ticketNumber || '').toLowerCase().includes(search) ||
             (w.shortTicket || '').toLowerCase().includes(search) ||
-            (w.location || '').toLowerCase().includes(search)
+            (w.prizeTitle || '').toLowerCase().includes(search) ||
+            (w.city || w.location || '').toLowerCase().includes(search)
           );
         }
 
@@ -411,6 +416,55 @@ export default {
 
         const body = await parseJsonBody(request);
         const { planType = '10rs' } = body;
+        const plan = planType;
+
+        if (!dataStore.spinCounts) {
+          dataStore.spinCounts = { '10rs': 0, '30rs': 0, '50rs': 0 };
+        }
+        if (!dataStore.spinLimits) {
+          dataStore.spinLimits = { '10rs': 10, '30rs': 2, '50rs': 2 };
+        }
+
+        const limit = dataStore.spinLimits[plan] || (plan === '10rs' ? 10 : 2);
+        const currentCount = dataStore.spinCounts[plan] || 0;
+
+        if (currentCount >= limit) {
+          return jsonResponse({
+            success: false,
+            message: `${plan.toUpperCase()} Spin limit reached (${currentCount}/${limit}). This spin wheel is now disabled.`
+          }, 400);
+        }
+
+        dataStore.spinCounts[plan] = currentCount + 1;
+        const spinNumber = dataStore.spinCounts[plan];
+
+        let tier = 'gold';
+        let prizeTitle = '';
+        let prizeAmount = '₹10,000';
+
+        if (plan === '10rs') {
+          if (spinNumber <= 5) {
+            tier = 'gold';
+            const titles = ['1st Prize', '2nd Prize', '3rd Prize', '4th Prize', '5th Prize'];
+            const amounts = ['₹10,000', '₹9,500', '₹9,000', '₹8,500', '₹8,000'];
+            prizeTitle = titles[spinNumber - 1];
+            prizeAmount = amounts[spinNumber - 1];
+          } else {
+            tier = 'silver';
+            const titles = ['6th Prize', '7th Prize', '8th Prize', '9th Prize', '10th Prize'];
+            const amounts = ['₹7,500', '₹7,000', '₹6,500', '₹6,000', '₹5,500'];
+            prizeTitle = titles[spinNumber - 6];
+            prizeAmount = amounts[spinNumber - 6];
+          }
+        } else if (plan === '30rs') {
+          tier = 'bronze';
+          prizeTitle = `Festival Special #${spinNumber}`;
+          prizeAmount = '₹10,000';
+        } else if (plan === '50rs') {
+          tier = 'purple';
+          prizeTitle = `Early Bird Bonus #${spinNumber}`;
+          prizeAmount = '₹10,000';
+        }
 
         const prizesByPlan = {
           '10rs': ['₹1,000 Cash Prize', 'Silver Coin (5g)', 'Diwali Festive Hamper', '₹500 Shopping Voucher', 'Family Cracker Box', 'Special Sweets Hamper'],
@@ -418,25 +472,156 @@ export default {
           '50rs': ['₹10,000 Cash Prize', '55" 4K Smart TV', '5G Smartphone', 'Gold Sovereign (2g)', 'Mega Diwali Bumper Hamper', 'Electric Scooter Voucher'],
         };
 
-        const prizes = prizesByPlan[planType] || prizesByPlan['10rs'];
+        const prizes = prizesByPlan[plan] || prizesByPlan['10rs'];
         const prizeWon = prizes[Math.floor(Math.random() * prizes.length)];
 
         const spinResult = {
           id: 'spin-' + Date.now(),
-          planType,
+          planType: plan,
+          spinNumber,
+          maxSpins: limit,
+          remainingSpins: limit - spinNumber,
+          isCompleted: spinNumber >= limit,
           winnerName: 'Lucky Draw Participant',
+          maskedName: 'L*** P***',
           token: 'DD-2026-' + Math.floor(10000 + Math.random() * 90000),
+          shortTicket: '#SPIN' + spinNumber,
           mobileNumber: '98******12',
           gmail: 'winner@gmail.com',
           location: 'India',
           prize: prizeWon,
+          prizeTitle,
+          prizeAmount,
+          tier,
           executedAt: new Date().toISOString(),
         };
+
+        const winnerRecord = {
+          id: 'spin-win-' + Date.now(),
+          drawId: 'draw-diwali-2026',
+          winnerName: spinResult.winnerName,
+          maskedName: spinResult.maskedName,
+          ticketNumber: spinResult.token,
+          shortTicket: spinResult.shortTicket,
+          prizeTitle: spinResult.prizeTitle,
+          prizeAmount: spinResult.prizeAmount,
+          tier: spinResult.tier,
+          drawDate: 'Diwali Day Spin Draw',
+          city: spinResult.location,
+          announcedAt: new Date().toISOString(),
+          isSpinWinner: true,
+          planType: plan,
+          spinNumber: spinNumber
+        };
+        dataStore.winners.unshift(winnerRecord);
 
         return jsonResponse({
           success: true,
           data: spinResult,
-          message: `Diwali Day ${planType.toUpperCase()} Spin successful! Winner awarded ${prizeWon}.`,
+          counts: dataStore.spinCounts,
+          limits: dataStore.spinLimits,
+          message: `Diwali Day ${plan.toUpperCase()} Spin #${spinNumber}/${limit} successful! Winner awarded ${prizeTitle} (${tier.toUpperCase()}).`,
+        });
+      }
+
+      // 14b. Admin Spin Recent Logs from Database
+      if (pathname === '/api/admin/spin/recent' && method === 'GET') {
+        return jsonResponse({
+          success: true,
+          data: dataStore.recentSpins || [],
+        });
+      }
+
+      // 14c. Store Diwali Day Spin Winner in Database
+      if (pathname === '/api/admin/spin/record' && method === 'POST') {
+        const body = await parseJsonBody(request);
+        const {
+          winnerName = 'Lucky Participant',
+          maskedName,
+          token = `DD-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+          shortTicket,
+          prize,
+          prizeTitle,
+          prizeAmount = '₹10,000',
+          tier = 'gold',
+          city = 'India',
+          planType = '10rs',
+          spinNumber = 1,
+          time,
+        } = body;
+
+        const count = spinNumber;
+        if (!dataStore.spinCounts) dataStore.spinCounts = { '10rs': 0, '30rs': 0, '50rs': 0 };
+        dataStore.spinCounts[planType] = Math.max(dataStore.spinCounts[planType] || 0, count);
+
+        const spinLog = {
+          id: 'spin-' + Date.now(),
+          planType,
+          winnerName,
+          token,
+          prize: prize || `${prizeTitle || 'Diwali Prize'} (${prizeAmount})`,
+          tier,
+          spinNumber: count,
+          time: time || new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        };
+
+        if (!dataStore.recentSpins) dataStore.recentSpins = [];
+        dataStore.recentSpins.unshift(spinLog);
+
+        const winnerRecord = {
+          id: 'spin-win-' + Date.now(),
+          drawId: 'draw-diwali-2026',
+          winnerName,
+          maskedName: maskedName || winnerName.split(' ').map(p => p[0] + '***').join(' '),
+          ticketNumber: token,
+          shortTicket: shortTicket || '#' + token.split('-').pop(),
+          prizeTitle: prizeTitle || spinLog.prize,
+          prizeAmount,
+          tier,
+          drawDate: 'Diwali Day Spin Draw',
+          city,
+          offerTag: planType === '30rs' ? '3X Entries • Triple Chances' : planType === '50rs' ? '5X Entries • VIP Bumper Pool' : undefined,
+          announcedAt: new Date().toISOString(),
+          isSpinWinner: true,
+          planType,
+          spinNumber: count,
+        };
+
+        dataStore.winners.unshift(winnerRecord);
+
+        return jsonResponse({
+          success: true,
+          message: 'Diwali Day Spin Winner successfully stored in database!',
+          data: spinLog,
+          counts: dataStore.spinCounts,
+        });
+      }
+
+      // 14d. Admin Spin Status (Counts & Limits)
+      if (pathname === '/api/admin/spin/status' && method === 'GET') {
+        if (!dataStore.spinCounts) dataStore.spinCounts = { '10rs': 0, '30rs': 0, '50rs': 0 };
+        if (!dataStore.spinLimits) dataStore.spinLimits = { '10rs': 10, '30rs': 2, '50rs': 2 };
+        return jsonResponse({
+          success: true,
+          data: {
+            counts: dataStore.spinCounts,
+            limits: dataStore.spinLimits,
+            remaining: {
+              '10rs': Math.max(0, dataStore.spinLimits['10rs'] - (dataStore.spinCounts['10rs'] || 0)),
+              '30rs': Math.max(0, dataStore.spinLimits['30rs'] - (dataStore.spinCounts['30rs'] || 0)),
+              '50rs': Math.max(0, dataStore.spinLimits['50rs'] - (dataStore.spinCounts['50rs'] || 0))
+            }
+          }
+        });
+      }
+
+      // 14e. Admin Spin Reset
+      if (pathname === '/api/admin/spin/reset' && method === 'POST') {
+        dataStore.spinCounts = { '10rs': 0, '30rs': 0, '50rs': 0 };
+        return jsonResponse({
+          success: true,
+          data: dataStore.spinCounts,
+          message: 'All spin wheel limits reset to 0.'
         });
       }
 

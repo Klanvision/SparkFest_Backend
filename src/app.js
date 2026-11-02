@@ -51,6 +51,11 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api', apiRoutes);
 
+// Root level endpoints for direct Razorpay webhook / standard integrations
+const paymentController = require('./controllers/paymentController');
+app.post('/create-order', paymentController.createOrder);
+app.post('/verify-payment', paymentController.verifyPayment);
+
 // Error Handling
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
