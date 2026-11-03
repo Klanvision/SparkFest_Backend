@@ -170,3 +170,22 @@ CREATE INDEX IF NOT EXISTS idx_participants_email ON participants(email);
 
 CREATE INDEX IF NOT EXISTS idx_faqs_category ON faqs(category);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp);
+
+-- 12. Spin Records Table (Diwali Day Lucky Spins: 10rs, 30rs, 50rs)
+CREATE TABLE IF NOT EXISTS spin_records (
+  id TEXT PRIMARY KEY,
+  plan_type TEXT NOT NULL, -- '10rs', '30rs', '50rs'
+  winner_name TEXT NOT NULL,
+  token TEXT NOT NULL,
+  short_ticket TEXT,
+  prize TEXT NOT NULL,
+  prize_title TEXT,
+  prize_amount TEXT,
+  tier TEXT DEFAULT 'gold',
+  city TEXT DEFAULT 'India',
+  spin_number INTEGER NOT NULL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_spin_records_plan_type ON spin_records(plan_type);
+CREATE INDEX IF NOT EXISTS idx_spin_records_created_at ON spin_records(created_at);

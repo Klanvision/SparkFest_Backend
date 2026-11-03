@@ -80,6 +80,11 @@ class ParticipantService {
       throw new Error('You must accept the terms and lucky draw rules to participate.');
     }
 
+    // Enforce that payment must be completed before tickets are generated
+    if (!data.paymentId && !data.isPaymentVerified) {
+      throw new Error('Payment is required before tickets can be generated. Please complete payment via Razorpay.');
+    }
+
     // Check if participant already exists
     let participant = dataStore.participants.find(p => p.phone === cleanPhone);
     if (!participant) {
